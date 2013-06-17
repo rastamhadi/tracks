@@ -1,21 +1,19 @@
 # tag cloud code inspired by this article
 #  http://www.juixe.com/techknow/index.php/2006/07/15/acts-as-taggable-tag-cloud/
 class TagCloud
-  attr_reader :user, :min, :divisor, :tags_90days, :min_90days, :divisor_90days
+  attr_reader :user
 
   def initialize(user, cut_off = nil)
     @user = user
     @cut_off = cut_off
   end
 
-  def compute
-    max, @min = 0, 0
-    tags.each { |t|
-      max = [t.count.to_i, max].max
-      @min = [t.count.to_i, @min].min
-    }
+  def divisor
+    @divisor ||= ((max - min) / levels) + 1
+  end
 
-    @divisor = ((max - @min) / levels) + 1
+  def min
+    0
   end
 
   def tags
@@ -30,6 +28,14 @@ class TagCloud
   end
 
   private
+
+  def max
+    tag_counts.max
+  end
+
+  def tag_counts
+    tags.map { |t| t.count.to_i }
+  end
 
   def levels
     10
